@@ -1,0 +1,165 @@
+---
+title: "GeneExpression_DataProcessingScript"
+output: html_document
+date: '2023-04-09'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#Load Library
+```{r}
+library(tidyverse)
+library(broom)
+library(dplyr)
+library(BiocManager)
+library(Biostrings)
+library(readr)
+library(readxl)
+
+library(parallel)
+library(glmnet)
+library(ranger)
+library(ROCR)
+
+
+library(dplyr)
+library(Biobase)
+library(AnnotationDbi)
+library(GO.db)
+library(impute)
+library(preprocessCore)
+library(WGCNA)
+```
+
+#Load Datasets
+```{r}
+
+df1 <- readr::read_tsv('/Users/tejasveneramesh/Document/PSCI/Serghei_lab/AnnotatedFiles/NC/GeneID.csv') %>% as.data.frame
+df4421_51 <- readr::read_tsv('/Users/tejasveneramesh/Document/PSCI/Serghei_lab/AnnotatedFiles/NC/EMTAB4421_51_ordered.tsv') %>% as.data.frame
+df_33314 <- readr::read_tsv('/Users/tejasveneramesh/Document/PSCI/Serghei_lab/AnnotatedFiles/NC/GSE33341AnnotatedNC.tsv') %>% as.data.frame
+df_54514 <- readr::read_tsv('/Users/tejasveneramesh/Document/PSCI/Serghei_lab/AnnotatedFiles/NC/GSE54514AnnotatedNC.tsv') %>% as.data.frame
+df_95233<- readr::read_tsv('/Users/tejasveneramesh/Document/PSCI/Serghei_lab/AnnotatedFiles/NC/GSE95233AnnotatedNC.tsv') %>% as.data.frame
+df_65682 <- readr::read_tsv('/Users/tejasveneramesh/Document/PSCI/Serghei_lab/AnnotatedFiles/NC/GSE65682AnnotatedNC.tsv') %>% as.data.frame
+df_27131 <- readr::read_tsv('/Users/tejasveneramesh/Document/PSCI/Serghei_lab/AnnotatedFiles/NC/GSE27131AnnotatedNC.tsv') %>% as.data.frame
+
+```
+
+#Remove Duplicates from each Datasets
+
+```{r}
+#EMTAB4421_51
+
+expr= df4421_51
+
+tmp.expr = dplyr::select(expr, -Gene_ID)
+rownames(tmp.expr) = paste('Genes', 1:dim(tmp.expr)[1], sep = '')
+tmp.expr = WGCNA::collapseRows(tmp.expr, expr$Gene_ID, rownames(tmp.expr))$datETcollapsed
+expr = tmp.expr
+expr[is.na(expr)] = 0
+df5_4421_51 = expr  %>% as.data.frame()
+df5_4421_51 <- cbind(Gene_ID = rownames(df5_4421_51), df5_4421_51)
+
+
+#readr::write_tsv(dfT2,'/Users/tejasveneramesh/Document/PSCI/Serghei_lab/AnnotatedFiles/NC/NC_Corrected/EMTAB4421_51.tsv')
+
+
+#GSE33314
+expr1= df_33314
+
+tmp.expr1 = dplyr::select(expr1, -Gene_ID)
+rownames(tmp.expr1) = paste('Genes', 1:dim(tmp.expr1)[1], sep = '')
+tmp.expr1 = WGCNA::collapseRows(tmp.expr1, expr1$Gene_ID, rownames(tmp.expr1))$datETcollapsed
+expr1 = tmp.expr1
+expr1[is.na(expr1)] = 0
+df5_33314 = expr1  %>% as.data.frame()
+df5_33314 <- cbind(Gene_ID = rownames(df5_33314), df5_33314)
+
+
+#readr::write_tsv(df4_33314,'/Users/tejasveneramesh/Document/PSCI/Serghei_lab/AnnotatedFiles/NC/NC_Corrected/GSE33314 .tsv')
+
+
+
+#GSE27131
+expr2= df_27131
+
+tmp.expr2 = dplyr::select(expr2, -Gene_ID)
+rownames(tmp.expr2) = paste('Genes', 1:dim(tmp.expr2)[1], sep = '')
+tmp.expr2 = WGCNA::collapseRows(tmp.expr2, expr2$Gene_ID, rownames(tmp.expr2))$datETcollapsed
+expr2 = tmp.expr2
+expr2[is.na(expr2)] = 0
+df5_27131 = expr2  %>% as.data.frame()
+df5_27131 <- cbind(Gene_ID = rownames(df5_27131), df5_27131)
+
+
+#readr::write_tsv(df4_27131,'/Users/tejasveneramesh/Document/PSCI/Serghei_lab/AnnotatedFiles/NC/NC_Corrected/GSE27131.tsv')
+
+
+#GSE54514
+expr3= df_54514
+
+tmp.expr3 = dplyr::select(expr3, -Gene_ID)
+rownames(tmp.expr3) = paste('Genes', 1:dim(tmp.expr3)[1], sep = '')
+tmp.expr3 = WGCNA::collapseRows(tmp.expr3, expr3$Gene_ID, rownames(tmp.expr3))$datETcollapsed
+expr3 = tmp.expr3
+expr3[is.na(expr3)] = 0
+df5_54514 = expr3  %>% as.data.frame()
+df5_54514 <- cbind(Gene_ID = rownames(df5_54514), df5_54514)
+
+#readr::write_tsv(df4_54514,'/Users/tejasveneramesh/Document/PSCI/Serghei_lab/AnnotatedFiles/NC/NC_Corrected/GSE54514.tsv')
+
+#GSE95233
+
+expr4= df_95233
+
+tmp.expr4 = dplyr::select(expr4, -Gene_ID)
+rownames(tmp.expr4) = paste('Genes', 1:dim(tmp.expr4)[1], sep = '')
+tmp.expr4 = WGCNA::collapseRows(tmp.expr4, expr4$Gene_ID, rownames(tmp.expr4))$datETcollapsed
+expr4 = tmp.expr4
+expr4[is.na(expr4)] = 0
+df5_95233 = expr4  %>% as.data.frame()
+df5_95233 <- cbind(Gene_ID = rownames(df5_95233), df5_95233)
+
+#GSE65682
+
+expr5= df_65682
+
+tmp.expr5 = dplyr::select(expr5, -Gene_ID)
+rownames(tmp.expr5) = paste('Genes', 1:dim(tmp.expr5)[1], sep = '')
+tmp.expr5 = WGCNA::collapseRows(tmp.expr5, expr5$Gene_ID, rownames(tmp.expr5))$datETcollapsed
+expr5 = tmp.expr5
+expr5[is.na(expr5)] = 0
+df5_65682 = expr5  %>% as.data.frame()
+df5_65682 <- cbind(Gene_ID = rownames(df5_65682), df5_65682)
+
+```
+
+#Combine datasets into One File
+```{r}
+
+df2_4421_51 <- left_join(x=df1, y= df5_4421_51) %>% distinct(Gene_ID, .keep_all =TRUE)
+df2_33314 <- left_join(x=df1, y=,df5_33314) %>% distinct(Gene_ID, .keep_all =TRUE)
+df2_54514 <- left_join(x=df1, y=,df5_54514) %>% distinct(Gene_ID, .keep_all =TRUE)
+df2_95233<- left_join(x=df1, y=df5_95233)  %>% distinct(Gene_ID, .keep_all =TRUE)
+df2_65682 <- left_join(x=df1, y=,df5_65682) %>% distinct(Gene_ID, .keep_all =TRUE)
+df2_27131 <- left_join(x=df1, y=,df5_27131) %>% distinct(Gene_ID, .keep_all =TRUE)
+
+
+Combined5 <- df2_4421_51  %>%
+  inner_join(df2_33314,by="Gene_ID")  %>%
+  inner_join(df2_54514,by="Gene_ID") %>%
+  inner_join(df2_95233,by="Gene_ID") %>%
+  inner_join(df2_65682,by="Gene_ID") %>%
+  inner_join(df2_27131,by="Gene_ID")
+
+exprC= Combined5
+exprC[is.na(exprC)] = 0
+Combined = exprC  %>% as.data.frame()
+Combined_T <- t(Combined) %>% as.data.frame()
+#readr::write_tsv(Combined_T,'GeneExpressionData_LR.tsv')
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

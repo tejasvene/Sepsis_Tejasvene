@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------------------
+## USE R
+# To Convert CEL into .tsv file
+setwd('/Users/tejasveneramesh/Desktop/GSE4607_RAW') 
+
+library(BiocManager)
+library(Biostrings)
+library(affy)
+data = ReadAffy()
+normalized = rma(data)
+write.exprs(normalized, file = "GSE46070OutputFileName.tsv", sep =  "\t")
+
+
+#For OutFile to be Annotated with Gene name ( USE R)
+
+library(BiocManager)
+library(Biostrings)
+library(affy)
+library(AnnotationDbi)
+library(hgu133plus2.db)
+setwd('/Users/tejasveneramesh/Desktop/GSE4607_RAW') 
+
+keytypes(hgu133plus2.db)
+
+select(hgu133plus2.db, c("1007_s_at"), c("SYMBOL", "ENTREZID", "GENENAME"))
+GSE4607 <- read.table("/Users/tejasveneramesh/Desktop/GSE4607_RAW/GSE46070OutputFileName.tsv", header = TRUE, sep = "\t")
+head(GSE4607)[,1:5]
+PROBES <- as.character(GSE4607$X)
+OUT <- select(hgu133plus2.db, PROBES, c("SYMBOL", "ENTREZID", "GENENAME"))
+
+GSE4607$X <- OUT[match(GSE4607$X, OUT$PROBEID), "SYMBOL"]
+write.table(GSE4607,"GSE46070Annotated.tsv", sep =  "\t", row.names = FALSE)

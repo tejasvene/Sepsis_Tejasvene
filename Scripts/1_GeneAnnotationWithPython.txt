@@ -1,0 +1,12 @@
+
+For Gene expression data that cannot be annotated with Gene names using the R code, download the SOFT files from the dataset information, GEO repository.
+
+1) Convert the .soft file to .tsv file - e.g GeneAnnotationsRefAffy.tsv
+2) Use the python script, "GeneAnnotation_Convert.py", to run and annotate into the Gene expression data file.
+
+Run the following On Terminal:
+
+python2 GeneAnnotation_Convert.py Input_GeneExpressionData.tsv GeneNames_SOFTFile.tsv > Output_GeneAnnotated.tsv
+
+e.g 
+python2 GeneAnnotation_Convert.py GSE27131_Output.tsv GeneAnnotationsRefAffy.tsv > Annotated.tsv

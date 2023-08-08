@@ -1,0 +1,26 @@
+##Use Python2
+#To Install Python2
+
+pip install python2
+To deactivate Python3: conda deactivate
+To activate Python2: conda activate python2
+
+# To download GEDIT
+! git clone 'https://github.com/BNadel/GEDIT.git'
+
+#Import Python tools/packages
+import pandas as pd
+import seaborn as sns
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats as st
+
+
+#To  open GED IT tool- use Python 2. Ensure you are in 
+import numpy as np
+import scipy  
+python2 GEDIT2.py -ref <reference matrix- HPCA.tsv> -mix <sample.tsv> -out MyOutFile.tsv
+
+#e.g python2 GEDIT2.py -ref /Users/tejasveneramesh/Document/PSCI/Serghei_lab/GEDIT/GEDITv2.0/ReferenceMatrices/HPCAOrthogonalV1.0.csv -mix /Users/tejasveneramesh/Desktop/GSE4607_RAW/GSE46070Annotated.tsv -out MyOutFileNormalised.tsv
+
+* Every row is gene and every column is cell type

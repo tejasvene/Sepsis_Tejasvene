@@ -1,0 +1,9 @@
+#1-Download .CEL.tar file from GEO NCBI
+#2- unzip the tar file on Bash Terminal
+Command to unzip tar:
+
+tar -xvf <file path name>
+
+# Alternative Method
+(A) Download the CEL.tar file
+(B) double click - it will unzip into a folder
